@@ -1,0 +1,55 @@
+# AI 작업 지시문
+
+이 프로젝트는 FastAPI + HTML/CSS/JavaScript 기반 재고 검색 웹앱이다.
+
+## 현재 구현
+
+- `app/main.py`: FastAPI 앱, 로그인/로그아웃/현재 사용자/재고 조회 API
+- `app/services/members.py`: `data/members.json` 기반 멤버 권한 저장소
+- `app/services/sheets.py`: Google Sheets 읽기, 서버 메모리 캐시, 샘플 데이터 fallback
+- `static/index.html`, `static/styles.css`, `static/app.js`: 로그인 화면, 재고 조회 화면, 제조사 필터, 실시간 검색
+
+## 화면 동작
+
+- Google 로그인 성공 후 로그인 화면은 숨기고 재고 조회 화면을 표시한다.
+- Google OAuth 환경변수가 없으면 `재고 검색 바로가기` 링크를 표시한다. 링크는 `/dev`로 이동하며 로그인/세션 없이 재고 조회 화면을 바로 표시한다.
+- 개발 화면은 `<body data-dev-mode="1">`와 로컬 전용 `X-Dev-Mode` 헤더를 사용해 재고 조회 API만 우회한다. 멤버 관리와 XLSX 업로드는 우회하지 않는다.
+- 화면 전환은 `hidden`과 `style.display`를 함께 사용한다. CSS에는 `[hidden] { display: none !important; }`가 있어 로그인 화면과 재고 화면이 동시에 보이지 않아야 한다.
+- 재고 테이블은 제조사, 품명, 규격, 신품/중고, 무자료가격, 계산서가격, 입고일자, 제조사 판매가, 재고수량 순서로 표시한다.
+- 제조사 필터는 전체, 티케이, 현대, 오티스, 중소, 기타 버튼을 제공한다.
+- 가격 컬럼은 1,000단위 구분 기호로 표시한다.
+- 재고수량이 0 이하인 품목은 화면에 표시하지 않는다.
+- 관리자 권한 사용자는 멤버 관리 화면에서 멤버 권한과 사용 여부를 수정할 수 있다.
+- 관리자 권한 사용자는 XLSX 파일을 업로드해 Google Sheet 재고 데이터를 갱신할 수 있다.
+
+## 실행
+
+1. `pip install -r requirements.txt`
+2. `python app/main.py` 또는 `uvicorn app.main:app --reload`
+3. 브라우저에서 `http://127.0.0.1:8000` 접속
+
+로컬 계정 로그인은 사용하지 않는다. Google OAuth 설정 후 Google 계정으로 로그인한다.
+
+## Google OAuth 환경변수
+
+- `GOOGLE_CLIENT_ID`: Google OAuth 클라이언트 ID
+- `GOOGLE_CLIENT_SECRET`: Google OAuth 클라이언트 보안 비밀
+- `INITIAL_ADMIN_EMAIL`: 첫 관리자 이메일. 없으면 첫 Google 로그인 계정이 admin이 된다.
+- `SESSION_SECRET_KEY`: 세션 서명 키
+
+Google OAuth 승인된 리디렉션 URI에는 `http://127.0.0.1:8000/auth/google/callback`을 등록한다.
+
+## Google Sheets 환경변수
+
+- `GOOGLE_SERVICE_ACCOUNT_JSON`: 서비스 계정 JSON 문자열 또는 JSON 파일 경로
+- `GOOGLE_SHEET_ID`: Google Sheet ID
+- `GOOGLE_SHEET_RANGE`: 선택값, 기본값 `A:K`
+
+환경변수가 없거나 Google Sheets 로딩이 실패하면 샘플 데이터로 동작한다.
+XLSX 업로드는 관리자만 가능하며, Google Sheets 쓰기 권한이 있는 서비스 계정이 필요하다.
+
+## 수정 원칙
+
+- 요청된 범위 안에서만 최소 변경한다.
+- 기존 파일 구조를 유지한다.
+- 코드 변경 후 `HISTORY.txt`와 이 파일을 함께 갱신한다.

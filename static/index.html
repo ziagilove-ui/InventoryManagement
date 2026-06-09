@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>재고 검색</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260609-view-fix-1" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="loginView" class="auth-view">
+        <div class="login-panel">
+          <h1>재고 검색</h1>
+          <p>Google 계정으로 로그인합니다.</p>
+          <p id="authHelp" class="help-text"></p>
+          <p id="loginError" class="error" hidden></p>
+          <button id="googleLoginButton" type="button">Google 로그인</button>
+          <a id="devEntryButton" class="button-link secondary-button" href="/dev">재고 검색 바로가기</a>
+        </div>
+      </section>
+
+      <section id="inventoryView" class="inventory-view" hidden>
+        <header class="topbar">
+          <div>
+            <h1>재고 조회</h1>
+            <p><span id="userText"></span><span id="sourceText"></span></p>
+          </div>
+          <div class="actions">
+            <button id="adminButton" type="button" hidden>멤버 관리</button>
+            <button id="refreshButton" type="button">새로고침</button>
+            <button id="logoutButton" type="button">로그아웃</button>
+          </div>
+        </header>
+
+        <section class="search-area">
+          <input id="searchInput" placeholder="품명, 규격, 제조사 검색" />
+          <div id="makerFilters" class="maker-filters" aria-label="제조사 필터">
+            <button class="active" type="button" data-maker="전체">전체</button>
+            <button type="button" data-maker="티케이">티케이</button>
+            <button type="button" data-maker="현대">현대</button>
+            <button type="button" data-maker="오티스">오티스</button>
+            <button type="button" data-maker="중소">중소</button>
+            <button type="button" data-maker="기타">기타</button>
+          </div>
+          <p>AND / OR 조건 검색을 지원하며, 현재 재고가 있는 품목만 표시합니다.</p>
+        </section>
+
+        <section class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>제조사</th>
+                <th>품명</th>
+                <th>규격</th>
+                <th>신품/중고</th>
+                <th>무자료가격</th>
+                <th>계산서가격</th>
+                <th>입고일자</th>
+                <th>제조사 판매가</th>
+                <th>재고수량</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
+        </section>
+      </section>
+
+      <section id="adminView" class="admin-view" hidden>
+        <header class="topbar">
+          <div>
+            <h1>멤버 관리</h1>
+            <p>관리자 권한과 재고 XLSX 업로드를 관리합니다.</p>
+          </div>
+          <div class="actions">
+            <button id="backButton" type="button">재고 조회</button>
+          </div>
+        </header>
+
+        <section class="admin-section">
+          <h2>재고 파일 업로드</h2>
+          <form id="uploadForm" class="upload-form">
+            <input id="xlsxFile" name="file" type="file" accept=".xlsx" required />
+            <button type="submit">업로드</button>
+          </form>
+          <p id="uploadStatus"></p>
+        </section>
+
+        <section class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>이메일</th>
+                <th>이름</th>
+                <th>권한</th>
+                <th>사용</th>
+              </tr>
+            </thead>
+            <tbody id="membersBody"></tbody>
+          </table>
+        </section>
+      </section>
+    </main>
+    <script src="/static/app.js?v=20260609-view-fix-1"></script>
+  </body>
+</html>
